@@ -1,0 +1,33 @@
+VPATH = @srcdir@
+CFLAGS = -Wall -O2
+CFLAGS += @cpu_flags@ @fpu_flags@
+LIBS = @LIBS@
+PACKAGE = /mnt/nfsroot/packages/fitting
+
+default : linfit polyfit
+
+linfit : linfit.c
+	gcc ${CFLAGS} -o $@ $^ ${LIBS}
+
+polyfit : polyfit.c
+	gcc ${CFLAGS} -o $@ $^ ${LIBS}
+
+install : install-bin install-man
+
+install-bin : linfit polyfit
+	install -m 0755 $< /usr/local/bin
+
+install-man : linfit.1
+	install -m 0644 $< /usr/local/man/man1
+
+package : default
+	install -d -m 0755 ${PACKAGE}
+	install -d -m 0755 ${PACKAGE}/root
+	install -d -m 0755 ${PACKAGE}/root/usr
+	install -d -m 0755 ${PACKAGE}/root/usr/local
+	install -d -m 0755 ${PACKAGE}/root/usr/local/bin
+	install -d -m 0755 ${PACKAGE}/root/usr/local/man
+	install -d -m 0755 ${PACKAGE}/root/usr/local/man/man1
+	install -m 0755 linfit polyfit ${PACKAGE}/root/usr/local/bin
+	install -m 0755 ${VPATH}/linfit.1 ${PACKAGE}/root/usr/local/man/man1
+	make -C ${PACKAGE}

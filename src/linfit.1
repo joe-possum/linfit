@@ -1,0 +1,85 @@
+.TH LINFIT 1 "February 3, 2003" "McGill Undergraduate Physics Labs" "Lab Rats Manual"
+.SH NAME
+linfit \- linear least-squares fitting tool
+.SH SYNOPSIS
+.B linfit
+[
+.B \-dhrg
+]
+[
+.BI \-a " awk_script"
+]
+[
+.I datafile
+]
+.SH DESCRIPTION
+.B linfit
+reads from
+.IR datafile
+(or standard input if none is specified),
+performs linear regression upon the data and outputs the parameters
+which minimize the chi-squared of the fit to the data.  The input data
+should consist of triplets,
+.I x, y
+and
+.I e,
+where
+.I x
+is the independent variable,
+.I y
+is the dependent variable, and
+.I e
+is the uncertainty upon
+.I y.
+.SH OPTIONS
+.TP
+.B \-h
+Print a
+.I helpful
+message.
+.TP
+.B \-g
+Generate a
+.B gnuplot
+script showing the fit to the data to
+.I stdout.
+.TP
+.B \-r
+Generate a
+.B gnuplot
+script showing the residual of the fit to the data to
+.I stdout.
+.TP
+.B \-d
+Turn on debugging output.  Very interesting for me, probably less so
+for you.
+.TP
+\fB\-a \fIawk_script\fR
+Write an
+.B AWK
+script to the filename
+.I awk_script
+which when used will apply the fitting function to the first column in
+the data fed to it.  I haven't thought about it much, but it would be
+possible to do this to other columns, and perhaps the function could
+be inverted ... on the other hand you can just edit the
+.B AWK
+script yourself!
+.SH BUGS
+.TP
+Known bugs and limitations:
+.br
+Graph production modes are incompatible with reading from
+.I stdin,
+this should be obvious.
+.br
+Should add a Chi-Squared output, this implies the data stream must be
+seekable or that data should be buffered ... one day Real Soon Now.
+.SH AUTHORS
+.TP
+Mark Orchard-Webb <orchard@physics.mcgill.ca>
+.br
+with numerous suggestions for improvements from the undergraduate
+population.
+.TP
+Algorithm is stolen from Bevington.
