@@ -1,9 +1,15 @@
-static char *id __attribute__ ((__unused__)) = "@(#) ganesh:/mnt/gersemi/src/Linfit/linfit.c;"
-                  "Friday November 24, 2006 (10:52);"
-                  "Mark Orchard-Webb;"
-                  "Compiled: "__DATE__ " (" __TIME__ ")" ;
+static char *id __attribute__ ((__unused__)) 
+  = "@(#) ganesh:URL: http://www.ugrad.physics.mcgill.ca/SVN/linfit/src/linfit.c;"
+    "Tuesday February  5, 2008 (15:33) (Revision: 1 before commit);"
+    "Mark Orchard-Webb;"
+    "Compiled: "__DATE__ " (" __TIME__ ")" ;
 
 /*
+ * Tuesday February  5, 2008 (15:33) (Revision: 1 before commit)
+ * =============================================================
+ * 
+ * Removed default output of rChisq test
+ * 
  * Friday November 24, 2006 (10:52)
  * ================================
  * 
@@ -182,7 +188,7 @@ int main (int argc, char **argv)
   int data_size = 0;		/* array size */
   double chisq;
   int ch;
-  int test_errors;		/*!< Testing of ChiSq response to change of parameters  */
+  int test_errors = 0;		/*!< Testing of ChiSq response to change of parameters  */
   FILE *in, *out, *awk;
   time_t tm;
   enum GRAPHS graph = NONE;
@@ -267,7 +273,7 @@ int main (int argc, char **argv)
   }
   chisq = ChiSq (y, s, f, data_count);
   fprintf (out, "rChisq = %.20g\n", chisq / (data_count - 2));
-  if (test_errors = 1) {
+  if (test_errors == 1) {
     for (i = 0; i < data_count; i++) {
       f[i] = (args.offset+args.e_offset) + args.slope * x[i];
     }
