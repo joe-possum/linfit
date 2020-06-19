@@ -66,6 +66,9 @@ void usage (const char *name)
 	   "\t-d Turn on debugging output\n"
 	   "\t-g\tWrite a gnuplot script showing graph of fit to stdout\n"
 	   "\t-r\tWrite a gnuplot script showing residual to stdout\n"
+	   "\t-s suffix\tAdd suffix to variables\n"
+	   "\t-p title\tSet title for data points\n"
+	   "\t-l title\tSet title for best-fit line\n"
 	   "\t-h\tDisplay this informative help message\n", name);
   exit (1);
 }
@@ -126,8 +129,8 @@ int linfit (struct fit *args)
   double delta, inv_delta;	/* the ugly denominator */
   double a, sigma_a, b, sigma_b; /* the parameters */
 
-  assert (W = malloc (args->count * sizeof (double)));
-  assert (A = malloc (args->count * sizeof (double)));
+  assert ((W = malloc (args->count * sizeof (double))));
+  assert ((A = malloc (args->count * sizeof (double))));
 
   for (i = 0; i < args->count; i++) W[i] = 1 / (args->error[i] * args->error[i]);
 
@@ -166,7 +169,7 @@ double ChiSq (double *y, double *s, double *f, int N)
 {
   int i;
   double *dchi, delta, rv;
-  assert (dchi = malloc (N * sizeof (double)));
+  assert ((dchi = malloc (N * sizeof (double))));
   for (i = 0; i < N; i++) {
     delta = (f[i] - y[i])/s[i];
     dchi[i] = delta * delta;
@@ -192,7 +195,7 @@ int main (int argc, char **argv)
   FILE *in, *out, *awk;
   time_t tm;
   enum GRAPHS graph = NONE;
-  char *filename = NULL, *suffix = "";
+  char *filename = NULL, *suffix = "", *points = "", *lines = "";
   struct fit args;
   
   time (&tm);
@@ -200,7 +203,7 @@ int main (int argc, char **argv)
   out = stdout;
   awk = NULL;
 
-  while ((ch = getopt (argc, argv, "a:dhrgs:")) != EOF)
+  while ((ch = getopt (argc, argv, "a:dhrgs:p:l:")) != EOF)
     switch (ch) {
     case 'h':
       usage (argv[0]);
@@ -215,6 +218,12 @@ int main (int argc, char **argv)
       break;
     case 'r':
       graph = RESIDUAL;
+      break;
+    case 'p':
+      points = strdup(optarg);
+      break;
+    case 'l':
+      lines = strdup(optarg);
       break;
     case 'a':
       fprintf (stderr, "Calibration conversion will be written to %s\n", optarg);
@@ -270,7 +279,7 @@ int main (int argc, char **argv)
   fprintf (out, "sigma_b%s = %.20g\n", suffix,args.e_slope);
   fprintf (out, "y%s(x) = a%s + b%s * x\n",suffix,suffix,suffix);
   chisq = 0;
-  assert (f = malloc (data_count * sizeof (double)));
+  assert ((f = malloc (data_count * sizeof (double))));
   for (i = 0; i < data_count; i++) {
     f[i] = args.offset + args.slope * x[i];
   }
@@ -315,7 +324,7 @@ int main (int argc, char **argv)
   }
   switch (graph) {
   case GRAPH:
-    fprintf (out, "plot '%s' using ($1):($2):($3) with error, y%s(x) with line\n", filename,suffix);
+    fprintf (out, "plot '%s' using ($1):($2):($3) with error title '%s', y%s(x) with line title '%s'\n", filename,points,suffix,lines);
     break;
   case RESIDUAL:
     fprintf (out, "plot '%s' using ($1):($2-y%s($1)):($3) with error\n", filename,suffix);
