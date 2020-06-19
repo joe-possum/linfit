@@ -192,7 +192,7 @@ int main (int argc, char **argv)
   FILE *in, *out, *awk;
   time_t tm;
   enum GRAPHS graph = NONE;
-  char *filename = NULL;
+  char *filename = NULL, *suffix = "";
   struct fit args;
   
   time (&tm);
@@ -200,7 +200,7 @@ int main (int argc, char **argv)
   out = stdout;
   awk = NULL;
 
-  while ((ch = getopt (argc, argv, "a:dhrg")) != EOF)
+  while ((ch = getopt (argc, argv, "a:dhrgs:")) != EOF)
     switch (ch) {
     case 'h':
       usage (argv[0]);
@@ -209,6 +209,9 @@ int main (int argc, char **argv)
       break;
     case 'g':
       graph = GRAPH;
+      break;
+    case 's':
+      suffix = strdup(optarg);
       break;
     case 'r':
       graph = RESIDUAL;
@@ -261,18 +264,18 @@ int main (int argc, char **argv)
   args.error = s;
   args.count = data_count;
   linfit (&args);
-  fprintf (out, "a = %.20g\n", args.offset);
-  fprintf (out, "sigma_a = %.20g\n", args.e_offset);
-  fprintf (out, "b = %.20g\n", args.slope);
-  fprintf (out, "sigma_b = %.20g\n", args.e_slope);
-  fprintf (out, "y(x) = a + b * x\n");
+  fprintf (out, "a%s = %.20g\n", suffix,args.offset);
+  fprintf (out, "sigma_a%s = %.20g\n", suffix,args.e_offset);
+  fprintf (out, "b%s = %.20g\n", suffix,args.slope);
+  fprintf (out, "sigma_b%s = %.20g\n", suffix,args.e_slope);
+  fprintf (out, "y%s(x) = a%s + b%s * x\n",suffix,suffix,suffix);
   chisq = 0;
   assert (f = malloc (data_count * sizeof (double)));
   for (i = 0; i < data_count; i++) {
     f[i] = args.offset + args.slope * x[i];
   }
   chisq = ChiSq (y, s, f, data_count);
-  fprintf (out, "rChisq = %.20g\n", chisq / (data_count - 2));
+  fprintf (out, "rChisq%s = %.20g\n", suffix,chisq / (data_count - 2));
   if (test_errors == 1) {
     for (i = 0; i < data_count; i++) {
       f[i] = (args.offset+args.e_offset) + args.slope * x[i];
@@ -312,10 +315,10 @@ int main (int argc, char **argv)
   }
   switch (graph) {
   case GRAPH:
-    fprintf (out, "plot '%s' using ($1):($2):($3) with error, y(x) with line\n", filename);
+    fprintf (out, "plot '%s' using ($1):($2):($3) with error, y%s(x) with line\n", filename,suffix);
     break;
   case RESIDUAL:
-    fprintf (out, "plot '%s' using ($1):($2-y($1)):($3) with error\n", filename);
+    fprintf (out, "plot '%s' using ($1):($2-y%s($1)):($3) with error\n", filename,suffix);
     break;
   case NONE:
     break;
