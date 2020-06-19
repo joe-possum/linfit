@@ -1,16 +1,17 @@
 VPATH = @srcdir@
 CFLAGS = -Wall -O2
 CFLAGS += @cpu_flags@ @fpu_flags@
+LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 PACKAGE = /mnt/nfsroot/packages/fitting
 
 default : linfit polyfit
 
 linfit : linfit.c
-	gcc ${CFLAGS} -o $@ $^ ${LIBS}
+	gcc ${CFLAGS} ${LDFLAGS} -o $@ $^ ${LIBS}
 
 polyfit : polyfit.c
-	gcc ${CFLAGS} -o $@ $^ ${LIBS}
+	gcc ${CFLAGS} ${LDFLAGS} -o $@ $^ ${LIBS}
 
 install : install-bin install-man
 
